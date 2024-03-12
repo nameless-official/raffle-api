@@ -18,8 +18,6 @@ export class UserService extends BaseService<User, CreateUserDto, UpdateUserDto>
     private userRepository: Repository<User>,
   ) {
     super(userRepository);
-    console.log(hashSync('Adm1ni$tR470r', 10));
-    console.log(hashSync('T3stU$3r*_', 10));
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -33,7 +31,7 @@ export class UserService extends BaseService<User, CreateUserDto, UpdateUserDto>
     });
 
     if (repeatedUserName)
-      throw new CustomException(`El nombre de usuario: ${username} no está disponible`, HttpStatus.BAD_REQUEST);
+      throw new CustomException(`The username: ${username} is not available`, HttpStatus.BAD_REQUEST);
 
     const repeatedEmail = await this.userRepository.findOne({
       where: {
@@ -42,7 +40,7 @@ export class UserService extends BaseService<User, CreateUserDto, UpdateUserDto>
     });
 
     if (repeatedEmail)
-      throw new CustomException(`El correo: ${email} ya tiene una cuenta en el sistema`, HttpStatus.BAD_REQUEST);
+      throw new CustomException(`The email: ${email} already has an account in the system`, HttpStatus.BAD_REQUEST);
 
     try {
       const newUser = {
@@ -67,7 +65,7 @@ export class UserService extends BaseService<User, CreateUserDto, UpdateUserDto>
         user_id: Not(user_id),
       });
       if (repeatedUserName.length > 0) {
-        throw new ConflictException(`Ya existe un usuario con este nombre: ${username}, intente con otro`);
+        throw new ConflictException(`A user with this username already exists: ${username}, please try another one.`);
       }
     }
 
@@ -77,7 +75,7 @@ export class UserService extends BaseService<User, CreateUserDto, UpdateUserDto>
         user_id: Not(user_id),
       });
       if (repeatedEmail.length > 0) {
-        throw new ConflictException(`Ya existe un usuario con este correo: ${email}, intente con otro`);
+        throw new ConflictException(`A user with this email already exists: ${email}, please try another one.`);
       }
     }
 

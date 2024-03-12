@@ -9,7 +9,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Raffle API')
-    .setDescription('Raffle API.')
+    .setDescription('Raffle API definition, for create raffles in the discord community of devTalles')
+    .addServer('http://localhost:3000', 'Local Server')
+    .addServer('https://raffle-api.up.railway.app', 'Production Server')
     .setVersion('1.0')
     .addBearerAuth()
     .build();

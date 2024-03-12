@@ -4,18 +4,20 @@ import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { UserService } from 'src/user/user.service';
 
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService, private userService: UserService) {}
 
+  @ApiOperation({ summary: 'Authenticates a user and returns a JWT token along with user information if successful.' })
   @Post('/login')
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
 
+  @ApiOperation({ summary: 'Verifies the JWT token and returns user information if the token is valid.' })
   @UseGuards(AuthGuard)
   @Get('/check-token')
   async checkToken(@Request() req: Request) {

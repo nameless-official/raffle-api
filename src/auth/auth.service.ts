@@ -13,7 +13,7 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<LoginResponse> {
     const { username, password } = loginDto;
     const invalidCredentialsMessage =
-      'Lo sentimos, pero las credenciales proporcionadas son inválidas. Por favor, verifica que has ingresado correctamente tu nombre de usuario y contraseña.';
+      'Sorry, but the credentials provided are invalid. Please verify that you have entered your username and password correctly.';
     const [user] = await this.userService.search(
       { conditions: [{ field: 'username', value: username, operator: '=' }] },
       {},
@@ -21,8 +21,7 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException(invalidCredentialsMessage);
     if (!compareSync(atob(password), user.password)) throw new UnauthorizedException(invalidCredentialsMessage);
-    if (!user.status)
-      throw new UnauthorizedException('Lo sentimos, pero tu cuenta de usuario no está activa en este momento.');
+    if (!user.status) throw new UnauthorizedException('Sorry, but your user account is not active at this time.');
 
     const { password: _, ...rest } = JSON.parse(JSON.stringify(user));
     return {

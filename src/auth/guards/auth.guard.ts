@@ -8,7 +8,7 @@ export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService, private userService: UserService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const unauthorizedMessage = 'Lo sentimos, pero no tienes los permisos necesarios para acceder a este recurso.';
+    const unauthorizedMessage = "Sorry, but you don't have the necessary permissions to access this resource.";
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
 
@@ -21,8 +21,7 @@ export class AuthGuard implements CanActivate {
 
       const user = await this.userService.findOne(parseInt(payload.user_id));
 
-      if (!user.status)
-        throw new UnauthorizedException('Lo sentimos, pero tu cuenta de usuario no está activa en este momento.');
+      if (!user.status) throw new UnauthorizedException('Sorry, but your user account is not active at this time.');
 
       request['user_id'] = payload.user_id;
     } catch (error) {

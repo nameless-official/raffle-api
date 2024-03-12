@@ -38,7 +38,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
 
   @ApiHeader({ name: 'Limit', allowEmptyValue: true, description: 'Record return limit (pagination) example: 10' })
   @ApiHeader({ name: 'Offset', allowEmptyValue: true, description: 'Record offset start (pagination) example: 0' })
-  @ApiHeader({ name: 'Order', allowEmptyValue: true, description: 'Event field to order with example: "SensorID" ' })
+  @ApiHeader({ name: 'Order', allowEmptyValue: true, description: 'Event field to order with example: "RaffleID" ' })
   @ApiHeader({
     name: 'Direction',
     allowEmptyValue: true,
@@ -57,7 +57,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
 
   @ApiHeader({ name: 'Limit', allowEmptyValue: true, description: 'Record return limit (pagination) example: 10' })
   @ApiHeader({ name: 'Offset', allowEmptyValue: true, description: 'Record offset start (pagination) example: 0' })
-  @ApiHeader({ name: 'Order', allowEmptyValue: true, description: 'Event field to order with example: "SensorID" ' })
+  @ApiHeader({ name: 'Order', allowEmptyValue: true, description: 'Event field to order with example: "RaffleID" ' })
   @ApiHeader({
     name: 'Direction',
     allowEmptyValue: true,
@@ -87,7 +87,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
 
   @ApiHeader({ name: 'Limit', allowEmptyValue: true, description: 'Record return limit (pagination) example: 10' })
   @ApiHeader({ name: 'Offset', allowEmptyValue: true, description: 'Record offset start (pagination) example: 0' })
-  @ApiHeader({ name: 'Order', allowEmptyValue: true, description: 'Event field to order with example: "SensorID" ' })
+  @ApiHeader({ name: 'Order', allowEmptyValue: true, description: 'Event field to order with example: "RaffleID" ' })
   @ApiHeader({
     name: 'Direction',
     allowEmptyValue: true,
@@ -176,7 +176,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
 
   protected constrollerErrorHandler(error: any) {
     throw new InternalServerErrorException(
-      `Ocurrió un error en el servidor y fue capturado en el controlador. Descripción del error: ${error.number}-${error.message} `,
+      `An error occurred on the server and was captured in the controller. Error description: ${error.number}-${error.message} `,
     );
   }
 }

@@ -76,7 +76,7 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
       const entity = await queryBuilder.getOne();
 
       if (!entity) {
-        throw new CustomException(`No se encontró ningún registro con el ID: ${id}`, HttpStatus.NOT_FOUND);
+        throw new CustomException(`No record found with ID: ${id}`, HttpStatus.NOT_FOUND);
       }
       return entity;
     } catch (error) {
