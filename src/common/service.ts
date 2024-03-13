@@ -246,7 +246,7 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
 
   protected serviceErrorHandler(error: any) {
     throw new InternalServerErrorException(
-      `Ocurrió un error en el servidor y fue capturado en el servicio. Descripción del error: ${error.number}-${error.message} `,
+      `An error occurred on the server and was captured in the service. Error description: ${error.number}-${error.message} `,
     );
   }
 
