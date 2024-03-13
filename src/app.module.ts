@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { RaffleStatusModule } from './raffle/raffle_status/raffle_status.module';
 import { PrizeLevelModule } from './raffle/prize_level/prize_level.module';
+import { RaffleModule } from './raffle/raffle/raffle.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { PrizeLevelModule } from './raffle/prize_level/prize_level.module';
     RoleModule,
     CommonModule,
     RaffleStatusModule,
+    RaffleModule,
     PrizeLevelModule,
   ],
   controllers: [],
