@@ -8,6 +8,7 @@ import { RaffleStatusModule } from './raffle/raffle_status/raffle_status.module'
 import { PrizeLevelModule } from './raffle/prize_level/prize_level.module';
 import { RaffleModule } from './raffle/raffle/raffle.module';
 import { PrizeModule } from './raffle/prize/prize.module';
+import { ParticipantModule } from './raffle/participant/participant.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { PrizeModule } from './raffle/prize/prize.module';
     RaffleModule,
     PrizeLevelModule,
     PrizeModule,
+    ParticipantModule,
   ],
   controllers: [],
   providers: [],
