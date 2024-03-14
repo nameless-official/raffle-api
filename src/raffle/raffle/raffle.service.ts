@@ -10,7 +10,7 @@ export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRa
   public findOneId = 'raffle_id';
   public createDTO = CreateRaffleDto;
   public updateDTO = UpdateRaffleDto;
-  public relations: string[] = [];
+  public relations: string[] = ['raffleStatus'];
   constructor(
     @Inject('RAFFLE_REPOSITORY')
     private raffleRepository: Repository<Raffle>,
