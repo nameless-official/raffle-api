@@ -24,9 +24,10 @@ export class ParticipantController extends BaseController<Participant, CreatePar
     type: CreateParticipantDto,
   })
   @Post()
-  async create(@Body() createDto: CreateParticipantDto) {
-    const belongsToServer = await this.discordService.isUserInServer(createDto.discord_user_id.toString());
+  async create(@Body() createParticipantDto: CreateParticipantDto) {
+    const { discord_user_id: discordUserId } = createParticipantDto;
+    const belongsToServer = await this.discordService.isUserInServer(discordUserId.toString());
     if (!belongsToServer) throw new BadRequestException('The user sent does not belong to the DevTalles server');
-    return this.participantService.create(createDto);
+    return this.participantService.create(createParticipantDto);
   }
 }

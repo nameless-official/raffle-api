@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { Participant } from './entities/participant.entity';
@@ -23,7 +23,7 @@ export class ParticipantService extends BaseService<Participant, CreateParticipa
   async create(createParticipantDto: CreateParticipantDto) {
     try {
       if (Array.isArray(createParticipantDto)) {
-        throw new BadRequestException('Solo se debe crear un registro a la vez');
+        throw new BadRequestException('Only one registration should be created at a time');
       }
 
       const validRecord = await this.validateEntity(createParticipantDto, this.createDTO);
@@ -31,12 +31,26 @@ export class ParticipantService extends BaseService<Participant, CreateParticipa
       if (validRecord instanceof BadRequestException) {
         throw validRecord;
       }
-      const { raffle_id: raffleId } = createParticipantDto;
+      const { raffle_id: raffleId, discord_user_id: discordUserId } = createParticipantDto;
 
       const newParticipant = this.participantRepository.create(createParticipantDto);
 
       const raffle = await this.raffleService.findOne(raffleId);
-      if (!raffle) throw new CustomException(`The selected raffle ${raffleId}, does not exists`, HttpStatus.NOT_FOUND);
+      if (!raffle) throw new CustomException(`The selected raffle, does not exists`, HttpStatus.NOT_FOUND);
+
+      const existingParticipant = await this.participantRepository.findOne({
+        where: { discord_user_id: discordUserId.toString(), raffle },
+      });
+
+      if (existingParticipant) {
+        throw new ConflictException(`You have already registered for this raffle with the user ID: ${discordUserId}`);
+      }
+
+      if (raffle.raffleStatus.code !== 'PUBLISHED')
+        throw new CustomException(
+          'The selected raffle does not accept participants at this time',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
 
       newParticipant.raffle = raffle;
 

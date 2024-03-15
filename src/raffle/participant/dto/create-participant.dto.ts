@@ -15,7 +15,4 @@ export class CreateParticipantDto {
 
   @IsEmail({}, { message: 'Property email must be a valid email address' })
   email: string;
-
-  @IsOptional()
-  prize_id?: number;
 }
