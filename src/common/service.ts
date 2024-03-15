@@ -1,4 +1,11 @@
-import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { DeepPartial, Repository, SelectQueryBuilder } from 'typeorm';
 import { PaginationDto } from './dto/pagination.dto';
 import { TotalRecords } from './dto/total-records.dto';
@@ -19,7 +26,7 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
 
   async create(entity: GenericCreateDto | GenericCreateDto[]): Promise<T | DeepPartial<T>> {
     if (Array.isArray(entity)) {
-      throw new BadRequestException('Solo se debe crear un registro a la vez');
+      throw new BadRequestException('Only one registration should be created at a time');
     }
 
     const validRecord = await this.validateEntity(entity, this.createDTO);
@@ -80,7 +87,6 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
       }
       return entity;
     } catch (error) {
-      if (error instanceof CustomException) throw error;
       this.serviceErrorHandler(error);
     }
   }
@@ -245,6 +251,13 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
   }
 
   protected serviceErrorHandler(error: any) {
+    if (
+      error instanceof ConflictException ||
+      error instanceof CustomException ||
+      error instanceof UnauthorizedException ||
+      error instanceof BadRequestException
+    )
+      throw error;
     throw new InternalServerErrorException(
       `An error occurred on the server and was captured in the service. Error description: ${error.number}-${error.message} `,
     );

@@ -9,6 +9,9 @@ import {
   UseGuards,
   Headers,
   InternalServerErrorException,
+  BadRequestException,
+  ConflictException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { PaginationDto } from './dto/pagination.dto';
@@ -17,6 +20,7 @@ import { SearchDto } from './dto/search.dto';
 import { ApiBody, ApiHeader, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { GenericCreateDto } from './dto/generic.dto';
 import { GenericUpdateDto } from './dto/generic.dto';
+import { CustomException } from './exeptions/custom.exeption';
 
 @Controller()
 export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
@@ -32,7 +36,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
     try {
       return this.service.create(createDto);
     } catch (error) {
-      this.constrollerErrorHandler(error);
+      this.controllerErrorHandler(error);
     }
   }
 
@@ -51,7 +55,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
     try {
       return this.service.findAll(this.getPagination(headers));
     } catch (error) {
-      this.constrollerErrorHandler(error);
+      this.controllerErrorHandler(error);
     }
   }
 
@@ -70,7 +74,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
     try {
       return this.service.getTotalRecords();
     } catch (error) {
-      this.constrollerErrorHandler(error);
+      this.controllerErrorHandler(error);
     }
   }
 
@@ -81,7 +85,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
     try {
       return this.service.batchRemove(searchDto);
     } catch (error) {
-      this.constrollerErrorHandler(error);
+      this.controllerErrorHandler(error);
     }
   }
 
@@ -102,7 +106,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
     try {
       return this.service.search(searchDto, this.getPagination(headers));
     } catch (error) {
-      this.constrollerErrorHandler(error);
+      this.controllerErrorHandler(error);
     }
   }
 
@@ -113,7 +117,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
     try {
       return this.service.searchTotalRecords(searchDto, this.getPagination(headers));
     } catch (error) {
-      this.constrollerErrorHandler(error);
+      this.controllerErrorHandler(error);
     }
   }
 
@@ -125,7 +129,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
     try {
       return this.service.findOne(+id);
     } catch (error) {
-      this.constrollerErrorHandler(error);
+      this.controllerErrorHandler(error);
     }
   }
 
@@ -140,7 +144,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
     try {
       return this.service.update(+id, updateDto);
     } catch (error) {
-      this.constrollerErrorHandler(error);
+      this.controllerErrorHandler(error);
     }
   }
 
@@ -152,7 +156,7 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
     try {
       return this.service.remove(+id);
     } catch (error) {
-      this.constrollerErrorHandler(error);
+      this.controllerErrorHandler(error);
     }
   }
 
@@ -170,11 +174,18 @@ export class BaseController<T, GenericCreateDto, GenericUpdateDto> {
       }
       return paginationDto;
     } catch (error) {
-      this.constrollerErrorHandler(error);
+      this.controllerErrorHandler(error);
     }
   }
 
-  protected constrollerErrorHandler(error: any) {
+  protected controllerErrorHandler(error: any) {
+    if (
+      error instanceof ConflictException ||
+      error instanceof CustomException ||
+      error instanceof UnauthorizedException ||
+      error instanceof BadRequestException
+    )
+      throw error;
     throw new InternalServerErrorException(
       `An error occurred on the server and was captured in the controller. Error description: ${error.number}-${error.message} `,
     );
