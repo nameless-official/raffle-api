@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Role } from 'src/role/entities/role.entity';
+import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany } from 'typeorm';
 
 @Entity({ schema: 'admin', name: 'users' })
 export class User {
@@ -25,4 +26,19 @@ export class User {
 
   @Column('bit')
   status?: boolean;
+
+  // @OneToMany(type => Role, )
+  @ManyToMany(() => Role, (role) => role.role_id)
+  @JoinTable({
+    name: 'user_roles',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'user_id',
+    },
+    inverseJoinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'role_id',
+    },
+  })
+  roles: Role[];
 }
