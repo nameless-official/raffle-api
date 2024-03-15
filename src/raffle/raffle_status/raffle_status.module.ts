@@ -9,5 +9,6 @@ import { AuthModule } from 'src/auth/auth.module';
   imports: [DatabaseModule, AuthModule],
   controllers: [RaffleStatusController],
   providers: [...raffleStatusProviders, RaffleStatusService],
+  exports: [RaffleStatusService],
 })
 export class RaffleStatusModule {}
