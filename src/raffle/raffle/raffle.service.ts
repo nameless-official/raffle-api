@@ -2,11 +2,12 @@ import { BadRequestException, HttpStatus, Inject, Injectable } from '@nestjs/com
 import { CreateRaffleDto } from './dto/create-raffle.dto';
 import { UpdateRaffleDto } from './dto/update-raffle.dto';
 import { Raffle } from './entities/raffle.entity';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { BaseService } from 'src/common/service';
 import { CustomException } from 'src/common/exeptions/custom.exeption';
 import { RaffleStatusService } from '../raffle_status/raffle_status.service';
 import slugify from 'slugify';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRaffleDto> {
@@ -25,7 +26,7 @@ export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRa
   async create(createRaffleDto: CreateRaffleDto) {
     try {
       if (Array.isArray(createRaffleDto)) {
-        throw new BadRequestException('Solo se debe crear un registro a la vez');
+        throw new BadRequestException('Only one registration should be created at a time');
       }
 
       const validRecord = await this.validateEntity(createRaffleDto, this.createDTO);
@@ -47,6 +48,31 @@ export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRa
 
       await this.raffleRepository.save(newRaffle);
       return newRaffle;
+    } catch (error) {
+      this.serviceErrorHandler(error);
+    }
+  }
+
+  async getPublishedRaffles(paginationDto: PaginationDto): Promise<Raffle[]> {
+    try {
+      const { limit = 10, offset = 0, order = '', direction = 'ASC' } = paginationDto;
+
+      const queryBuilder: SelectQueryBuilder<Raffle> = this.raffleRepository.createQueryBuilder(
+        this.raffleRepository.metadata.tableName,
+      );
+      queryBuilder.take(limit).skip(offset);
+
+      if (order) {
+        queryBuilder.orderBy(`${this.raffleRepository.metadata.tableName}.${order}`, direction);
+      }
+
+      for (const relation of this.relations) {
+        queryBuilder.leftJoinAndSelect(`${this.raffleRepository.metadata.tableName}.${relation}`, `${relation}`);
+      }
+
+      queryBuilder.where(`${this.relations[0]}.code = :code`, { code: 'PUBLISHED' });
+
+      return await queryBuilder.getMany();
     } catch (error) {
       this.serviceErrorHandler(error);
     }
