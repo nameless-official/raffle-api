@@ -19,7 +19,12 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   app.enableCors({
-    origin: ['http://localhost:4200', 'http://localhost:3000', 'https://raffle-api.up.railway.app'],
+    origin: [
+      'http://localhost:4200',
+      'http://localhost:3000',
+      'https://raffle-api.up.railway.app',
+      'https://raffle-app.up.railway.app',
+    ],
   });
 
   app.useGlobalPipes(
