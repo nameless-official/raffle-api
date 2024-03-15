@@ -4,7 +4,7 @@ import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { UserService } from 'src/user/user.service';
 
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Auth')
 @Controller('auth')
