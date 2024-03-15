@@ -126,7 +126,7 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
       const { limit = 10, offset = 0, order = '', direction = '' } = paginationDto;
 
       if (!conditions || conditions.length === 0) {
-        throw new BadRequestException('No se han enviado las condiciones necesarias');
+        throw new BadRequestException('The necessary conditions have not been sent.');
       }
 
       let queryBuilder = this.repository.createQueryBuilder(this.repository.metadata.tableName);
@@ -156,7 +156,7 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
       const { conditions } = searchDto;
 
       if (!conditions || conditions.length === 0) {
-        throw new BadRequestException('No se han enviado las condiciones necesarias');
+        throw new BadRequestException('The necessary conditions have not been sent.');
       }
 
       let queryBuilder = this.repository.createQueryBuilder(this.repository.metadata.tableName);
@@ -178,7 +178,7 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
       const { limit = 10, offset = 0, order = '', direction = '' } = paginationDto;
 
       if (!conditions || conditions.length === 0) {
-        throw new BadRequestException('No se han enviado las condiciones necesarias');
+        throw new BadRequestException('The necessary conditions have not been sent.');
       }
 
       let queryBuilder = this.repository.createQueryBuilder(this.repository.metadata.tableName);
@@ -258,6 +258,6 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
     if (errors.length === 0) return true;
 
     const error = errors.map((e) => e.constraints);
-    return new BadRequestException(error, 'No se cumplieron las condiciones necesarias para el registro');
+    return new BadRequestException(error, 'The necessary conditions for registration were not met.');
   }
 }
