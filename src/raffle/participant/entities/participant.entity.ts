@@ -10,8 +10,8 @@ export class Participant {
   @JoinColumn({ name: 'raffle_id' })
   raffle: Raffle;
 
-  @Column()
-  discord_user_id: number;
+  @Column({ length: 500 })
+  discord_user_id: string;
 
   @Column({ length: 255 })
   name: string;

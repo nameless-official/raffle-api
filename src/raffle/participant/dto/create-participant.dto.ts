@@ -4,9 +4,10 @@ export class CreateParticipantDto {
   @IsNotEmpty({ message: 'Property raffle_id is required' })
   raffle_id: number;
 
-  @IsInt({ message: 'Property discord_user_id must be an integer value' })
+  @IsString({ message: 'Property discord_user_id must be a string value' })
   @IsNotEmpty({ message: 'Property discord_user_id is required' })
-  discord_user_id: number;
+  @MaxLength(500, { message: 'Property name must be smaller than 500 characters' })
+  discord_user_id: string;
 
   @IsString({ message: 'Property name must be a string value' })
   @MaxLength(255, { message: 'Property name must be smaller than 255 characters' })
