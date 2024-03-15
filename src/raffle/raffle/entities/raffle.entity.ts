@@ -13,10 +13,10 @@ export class Raffle {
   name: string;
 
   @Column({ type: 'date' })
-  start_date: string;
+  start_date: Date;
 
   @Column({ type: 'date' })
-  end_date: string;
+  end_date: Date;
 
   @Column({ type: 'text', nullable: true })
   description: string;
