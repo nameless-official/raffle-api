@@ -20,6 +20,7 @@ export class ParticipantService extends BaseService<Participant, CreateParticipa
   ) {
     super(participantRepository);
   }
+
   async create(createParticipantDto: CreateParticipantDto) {
     try {
       if (Array.isArray(createParticipantDto)) {
@@ -56,6 +57,31 @@ export class ParticipantService extends BaseService<Participant, CreateParticipa
 
       await this.participantRepository.save(newParticipant);
       return newParticipant;
+    } catch (error) {
+      this.serviceErrorHandler(error);
+    }
+  }
+
+  async update(participantId: number, updateParticipantDto: UpdateParticipantDto) {
+    const validRecord = await this.validateEntity(updateParticipantDto, this.updateDTO);
+
+    if (validRecord instanceof BadRequestException) {
+      throw validRecord;
+    }
+
+    const { raffle_id: raffleId } = updateParticipantDto;
+
+    const newRaffle = this.participantRepository.create(updateParticipantDto);
+
+    if (raffleId) {
+      const raffle = await this.raffleService.findOne(raffleId);
+      if (!raffle) throw new CustomException(`The selected raffle ${raffleId}, does not exists`, HttpStatus.NOT_FOUND);
+      newRaffle.raffle = raffle;
+    }
+
+    try {
+      await this.participantRepository.update(participantId, updateParticipantDto);
+      return this.findOne(participantId);
     } catch (error) {
       this.serviceErrorHandler(error);
     }
