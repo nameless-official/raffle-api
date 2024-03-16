@@ -8,6 +8,7 @@ import { CustomException } from 'src/common/exeptions/custom.exeption';
 import { RaffleStatusService } from '../raffle_status/raffle_status.service';
 import slugify from 'slugify';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { TotalRecords } from 'src/common/dto/total-records.dto';
 
 @Injectable()
 export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRaffleDto> {
@@ -100,6 +101,25 @@ export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRa
       queryBuilder.where(`${this.relations[0]}.code = :code`, { code: 'PUBLISHED' });
 
       return await queryBuilder.getMany();
+    } catch (error) {
+      this.serviceErrorHandler(error);
+    }
+  }
+
+  async getTotalPublishedRaffles(): Promise<TotalRecords> {
+    try {
+      const queryBuilder: SelectQueryBuilder<Raffle> = this.raffleRepository.createQueryBuilder(
+        this.raffleRepository.metadata.tableName,
+      );
+
+      for (const relation of this.relations) {
+        queryBuilder.leftJoinAndSelect(`${this.raffleRepository.metadata.tableName}.${relation}`, `${relation}`);
+      }
+
+      queryBuilder.where(`${this.relations[0]}.code = :code`, { code: 'PUBLISHED' });
+
+      const totalRecords = await queryBuilder.getCount();
+      return { totalRecords };
     } catch (error) {
       this.serviceErrorHandler(error);
     }

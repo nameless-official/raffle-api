@@ -36,6 +36,25 @@ export class RaffleController extends BaseController<Raffle, CreateRaffleDto, Up
     }
   }
 
+  @ApiHeader({ name: 'Limit', allowEmptyValue: true, description: 'Record return limit (pagination) example: 10' })
+  @ApiHeader({ name: 'Offset', allowEmptyValue: true, description: 'Record offset start (pagination) example: 0' })
+  @ApiHeader({ name: 'Order', allowEmptyValue: true, description: 'Event field to order with example: "RaffleID" ' })
+  @ApiHeader({
+    name: 'Direction',
+    allowEmptyValue: true,
+    description: 'Order direction ASC (1), DESC (-1) example: -1',
+  })
+  @ApiOperation({ summary: 'Gets the total record count' })
+  @UseGuards(AuthGuard)
+  @Get('getTotalPublishedRaffles')
+  getTotalPublishedRaffles() {
+    try {
+      return this.raffleService.getTotalPublishedRaffles();
+    } catch (error) {
+      this.controllerErrorHandler(error);
+    }
+  }
+
   @ApiParam({ name: 'slug', type: 'string' })
   @ApiOperation({ summary: 'Gets an especific record by RecordId' })
   @UseGuards(AuthGuard)
