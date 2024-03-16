@@ -56,7 +56,7 @@ export class RaffleController extends BaseController<Raffle, CreateRaffleDto, Up
 
   @ApiParam({ name: 'slug', type: 'string' })
   @ApiOperation({ summary: 'Gets an especific record by RecordId' })
-  @Get(':slug')
+  @Get('findOneBySlug/:slug')
   async findOneBySlug(@Param('slug') slug: string) {
     try {
       const searchBySlugConditions: SearchDto = { conditions: [{ field: 'slug', operator: '=', value: slug }] };
