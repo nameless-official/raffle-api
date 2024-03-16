@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards, Headers } from '@nestjs/common';
+import { Controller, Get, Param, Headers } from '@nestjs/common';
 import { RaffleService } from './raffle.service';
 import { CreateRaffleDto } from './dto/create-raffle.dto';
 import { UpdateRaffleDto } from './dto/update-raffle.dto';
@@ -6,7 +6,6 @@ import { BaseController } from 'src/common/controller';
 import { Raffle } from './entities/raffle.entity';
 
 import { ApiBearerAuth, ApiHeader, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { SearchDto } from 'src/common/dto/search.dto';
 import { PrizeService } from '../prize/prize.service';
 

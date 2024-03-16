@@ -22,4 +22,7 @@ export class UpdateParticipantDto extends PartialType(CreateParticipantDto) {
   @IsOptional()
   @IsEmail({}, { message: 'Property email must be a valid email address' })
   email?: string;
+
+  @IsOptional()
+  prize_id?: number;
 }

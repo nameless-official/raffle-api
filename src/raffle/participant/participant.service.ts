@@ -1,3 +1,4 @@
+import { PrizeService } from './../prize/prize.service';
 import { BadRequestException, ConflictException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
@@ -17,6 +18,7 @@ export class ParticipantService extends BaseService<Participant, CreateParticipa
     @Inject('PARTICIPANT_REPOSITORY')
     private participantRepository: Repository<Participant>,
     private raffleService: RaffleService,
+    private prizeService: PrizeService,
   ) {
     super(participantRepository);
   }
@@ -69,21 +71,77 @@ export class ParticipantService extends BaseService<Participant, CreateParticipa
       throw validRecord;
     }
 
-    const { raffle_id: raffleId } = updateParticipantDto;
+    const { raffle_id: raffleId, prize_id: prizeId } = updateParticipantDto;
 
-    const newRaffle = this.participantRepository.create(updateParticipantDto);
+    const newParticipant = this.participantRepository.create(updateParticipantDto);
 
     if (raffleId) {
       const raffle = await this.raffleService.findOne(raffleId);
       if (!raffle) throw new CustomException(`The selected raffle ${raffleId}, does not exists`, HttpStatus.NOT_FOUND);
-      newRaffle.raffle = raffle;
+      newParticipant.raffle = raffle;
+    }
+
+    if (prizeId) {
+      const prize = await this.prizeService.findOne(prizeId);
+      if (!prize) throw new CustomException(`The selected prize ${prizeId}, does not exists`, HttpStatus.NOT_FOUND);
+      newParticipant.prize = prize;
     }
 
     try {
-      await this.participantRepository.update(participantId, updateParticipantDto);
+      await this.participantRepository.update(participantId, newParticipant);
       return this.findOne(participantId);
     } catch (error) {
       this.serviceErrorHandler(error);
     }
+  }
+
+  selectWinnersByFisherYatesAlgorithm(participants: number[], prizes: number[]): { winner: number; prize: number }[] {
+    const numWinners = Math.min(participants.length, prizes.length);
+    const winnersWithPrizes: { winner: number; prize: number }[] = [];
+
+    const participantsCopy = participants.slice();
+    const prizesCopy = prizes.slice();
+
+    for (let i = participantsCopy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [participantsCopy[i], participantsCopy[j]] = [participantsCopy[j], participantsCopy[i]];
+    }
+
+    for (let i = 0; i < numWinners; i++) {
+      winnersWithPrizes.push({
+        winner: participantsCopy[i],
+        prize: prizesCopy[i],
+      });
+    }
+
+    return winnersWithPrizes;
+  }
+
+  selectWinnersByParallelShuffleAlgorithm(
+    participants: number[],
+    prizes: number[],
+  ): { winner: number; prize: number }[] {
+    const numWinners = Math.min(participants.length, prizes.length);
+    const winnersWithPrizes: { winner: number; prize: number }[] = [];
+
+    const participantsCopy = participants.slice();
+    const prizesCopy = prizes.slice();
+
+    const shuffledParticipants: number[] = [];
+    while (participantsCopy.length > 0) {
+      const randomIndex = Math.floor(Math.random() * participantsCopy.length);
+      const removedParticipant = participantsCopy.splice(randomIndex, 1)[0];
+      shuffledParticipants.push(removedParticipant);
+    }
+    participantsCopy.push(...shuffledParticipants);
+
+    for (let i = 0; i < numWinners; i++) {
+      winnersWithPrizes.push({
+        winner: participantsCopy[i],
+        prize: prizesCopy[i],
+      });
+    }
+
+    return winnersWithPrizes;
   }
 }
