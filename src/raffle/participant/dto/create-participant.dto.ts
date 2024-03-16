@@ -11,8 +11,8 @@ export class CreateParticipantDto {
 
   @IsString({ message: 'Property name must be a string value' })
   @MaxLength(255, { message: 'Property name must be smaller than 255 characters' })
-  name: string;
+  name?: string;
 
   @IsEmail({}, { message: 'Property email must be a valid email address' })
-  email: string;
+  email?: string;
 }
