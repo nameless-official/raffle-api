@@ -53,6 +53,33 @@ export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRa
     }
   }
 
+  async update(raffleId: number, updateRaffleDto: UpdateRaffleDto) {
+    const validRecord = await this.validateEntity(updateRaffleDto, this.updateDTO);
+
+    if (validRecord instanceof BadRequestException) {
+      throw validRecord;
+    }
+
+    const { raffle_status_id: raffleStatusId } = updateRaffleDto;
+
+    const newRaffle = this.raffleRepository.create(updateRaffleDto);
+
+    if (raffleStatusId) {
+      const raffleStatus = await this.raffleStatusService.findOne(raffleStatusId);
+      if (!raffleStatus)
+        throw new CustomException(`The selected raffle ${raffleStatusId}, does not exists`, HttpStatus.NOT_FOUND);
+
+      newRaffle.raffleStatus = raffleStatus;
+    }
+
+    try {
+      await this.raffleRepository.update(raffleId, updateRaffleDto);
+      return this.findOne(raffleId);
+    } catch (error) {
+      this.serviceErrorHandler(error);
+    }
+  }
+
   async getPublishedRaffles(paginationDto: PaginationDto): Promise<Raffle[]> {
     try {
       const { limit = 10, offset = 0, order = '', direction = 'ASC' } = paginationDto;
