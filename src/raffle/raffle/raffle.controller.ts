@@ -45,7 +45,6 @@ export class RaffleController extends BaseController<Raffle, CreateRaffleDto, Up
     description: 'Order direction ASC (1), DESC (-1) example: -1',
   })
   @ApiOperation({ summary: 'Gets the total record count' })
-  @UseGuards(AuthGuard)
   @Get('getTotalPublishedRaffles')
   getTotalPublishedRaffles() {
     try {
@@ -57,7 +56,6 @@ export class RaffleController extends BaseController<Raffle, CreateRaffleDto, Up
 
   @ApiParam({ name: 'slug', type: 'string' })
   @ApiOperation({ summary: 'Gets an especific record by RecordId' })
-  @UseGuards(AuthGuard)
   @Get(':slug')
   async findOneBySlug(@Param('slug') slug: string) {
     try {
