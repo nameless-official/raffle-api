@@ -9,5 +9,6 @@ import { AuthModule } from 'src/auth/auth.module';
   imports: [DatabaseModule, AuthModule],
   controllers: [PrizeLevelController],
   providers: [...prizeLevelProviders, PrizeLevelService],
+  exports: [PrizeLevelService],
 })
 export class PrizeLevelModule {}
