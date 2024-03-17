@@ -8,6 +8,7 @@ import { CustomException } from 'src/common/exeptions/custom.exeption';
 import { RaffleStatusService } from '../raffle_status/raffle_status.service';
 import slugify from 'slugify';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { TotalRecords } from 'src/common/dto/total-records.dto';
 
 @Injectable()
 export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRaffleDto> {
@@ -53,6 +54,33 @@ export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRa
     }
   }
 
+  async update(raffleId: number, updateRaffleDto: UpdateRaffleDto) {
+    const validRecord = await this.validateEntity(updateRaffleDto, this.updateDTO);
+
+    if (validRecord instanceof BadRequestException) {
+      throw validRecord;
+    }
+
+    const { raffle_status_id: raffleStatusId } = updateRaffleDto;
+
+    const newRaffle = this.raffleRepository.create(updateRaffleDto);
+
+    if (raffleStatusId) {
+      const raffleStatus = await this.raffleStatusService.findOne(raffleStatusId);
+      if (!raffleStatus)
+        throw new CustomException(`The selected raffle ${raffleStatusId}, does not exists`, HttpStatus.NOT_FOUND);
+
+      newRaffle.raffleStatus = raffleStatus;
+    }
+
+    try {
+      await this.raffleRepository.update(raffleId, updateRaffleDto);
+      return this.findOne(raffleId);
+    } catch (error) {
+      this.serviceErrorHandler(error);
+    }
+  }
+
   async getPublishedRaffles(paginationDto: PaginationDto): Promise<Raffle[]> {
     try {
       const { limit = 10, offset = 0, order = '', direction = 'ASC' } = paginationDto;
@@ -73,6 +101,25 @@ export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRa
       queryBuilder.where(`${this.relations[0]}.code = :code`, { code: 'PUBLISHED' });
 
       return await queryBuilder.getMany();
+    } catch (error) {
+      this.serviceErrorHandler(error);
+    }
+  }
+
+  async getTotalPublishedRaffles(): Promise<TotalRecords> {
+    try {
+      const queryBuilder: SelectQueryBuilder<Raffle> = this.raffleRepository.createQueryBuilder(
+        this.raffleRepository.metadata.tableName,
+      );
+
+      for (const relation of this.relations) {
+        queryBuilder.leftJoinAndSelect(`${this.raffleRepository.metadata.tableName}.${relation}`, `${relation}`);
+      }
+
+      queryBuilder.where(`${this.relations[0]}.code = :code`, { code: 'PUBLISHED' });
+
+      const totalRecords = await queryBuilder.getCount();
+      return { totalRecords };
     } catch (error) {
       this.serviceErrorHandler(error);
     }

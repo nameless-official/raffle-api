@@ -6,8 +6,10 @@ import { BaseController } from 'src/common/controller';
 import { Prize } from './entities/prize.entity';
 
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/role/role.decorator';
 
 @ApiBearerAuth()
+@Roles('admin')
 @ApiTags('Prize')
 @Controller('prize')
 export class PrizeController extends BaseController<Prize, CreatePrizeDto, UpdatePrizeDto> {
