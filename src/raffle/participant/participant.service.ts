@@ -42,7 +42,7 @@ export class ParticipantService extends BaseService<Participant, CreateParticipa
       const raffle = await this.raffleService.findOne(raffleId);
       if (!raffle) throw new CustomException('The selected raffle, does not exists', HttpStatus.NOT_FOUND);
 
-      if (compareDesc(raffle.start_date, new Date()) === 1 || compareAsc(new Date(), raffle.end_date) === 1)
+      if (compareDesc(new Date(), raffle.start_date) === 1 || compareAsc(new Date(), raffle.end_date) === 1)
         throw new CustomException(
           'The selected raffle does not accept participants at this time',
           HttpStatus.NOT_ACCEPTABLE,
