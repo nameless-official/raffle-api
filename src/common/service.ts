@@ -1,4 +1,11 @@
-import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { DeepPartial, Repository, SelectQueryBuilder } from 'typeorm';
 import { PaginationDto } from './dto/pagination.dto';
 import { TotalRecords } from './dto/total-records.dto';
@@ -19,7 +26,7 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
 
   async create(entity: GenericCreateDto | GenericCreateDto[]): Promise<T | DeepPartial<T>> {
     if (Array.isArray(entity)) {
-      throw new BadRequestException('Solo se debe crear un registro a la vez');
+      throw new BadRequestException('Only one registration should be created at a time');
     }
 
     const validRecord = await this.validateEntity(entity, this.createDTO);
@@ -80,7 +87,6 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
       }
       return entity;
     } catch (error) {
-      if (error instanceof CustomException) throw error;
       this.serviceErrorHandler(error);
     }
   }
@@ -126,7 +132,7 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
       const { limit = 10, offset = 0, order = '', direction = '' } = paginationDto;
 
       if (!conditions || conditions.length === 0) {
-        throw new BadRequestException('No se han enviado las condiciones necesarias');
+        throw new BadRequestException('The necessary conditions have not been sent.');
       }
 
       let queryBuilder = this.repository.createQueryBuilder(this.repository.metadata.tableName);
@@ -156,7 +162,7 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
       const { conditions } = searchDto;
 
       if (!conditions || conditions.length === 0) {
-        throw new BadRequestException('No se han enviado las condiciones necesarias');
+        throw new BadRequestException('The necessary conditions have not been sent.');
       }
 
       let queryBuilder = this.repository.createQueryBuilder(this.repository.metadata.tableName);
@@ -178,7 +184,7 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
       const { limit = 10, offset = 0, order = '', direction = '' } = paginationDto;
 
       if (!conditions || conditions.length === 0) {
-        throw new BadRequestException('No se han enviado las condiciones necesarias');
+        throw new BadRequestException('The necessary conditions have not been sent.');
       }
 
       let queryBuilder = this.repository.createQueryBuilder(this.repository.metadata.tableName);
@@ -211,6 +217,9 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
           break;
         case 'notLike':
           queryBuilder.andWhere(`${this.repository.metadata.tableName}.${field} NOT LIKE '${value}'`);
+          break;
+        case 'notNull':
+          queryBuilder.andWhere(`${this.repository.metadata.tableName}.${field} IS NOT NULL`);
           break;
         case 'in':
           queryBuilder.andWhere(
@@ -245,8 +254,15 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
   }
 
   protected serviceErrorHandler(error: any) {
+    if (
+      error instanceof ConflictException ||
+      error instanceof CustomException ||
+      error instanceof UnauthorizedException ||
+      error instanceof BadRequestException
+    )
+      throw error;
     throw new InternalServerErrorException(
-      `Ocurrió un error en el servidor y fue capturado en el servicio. Descripción del error: ${error.number}-${error.message} `,
+      `An error occurred on the server and was captured in the service. Error description: ${error.number}-${error.message} `,
     );
   }
 
@@ -258,6 +274,6 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
     if (errors.length === 0) return true;
 
     const error = errors.map((e) => e.constraints);
-    return new BadRequestException(error, 'No se cumplieron las condiciones necesarias para el registro');
+    return new BadRequestException(error, 'The necessary conditions for registration were not met.');
   }
 }

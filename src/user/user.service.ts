@@ -12,7 +12,7 @@ export class UserService extends BaseService<User, CreateUserDto, UpdateUserDto>
   public findOneId = 'user_id';
   public createDTO = CreateUserDto;
   public updateDTO = UpdateUserDto;
-  public relations: string[] = [];
+  public relations: string[] = ['roles'];
   constructor(
     @Inject('USER_REPOSITORY')
     private userRepository: Repository<User>,

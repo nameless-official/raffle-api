@@ -20,7 +20,7 @@ export class SearchCondition {
   @IsString()
   @IsIn(['like', 'notLike', 'in', 'between', '=', '<', '>', '<=', '>=', '<>'])
   @ApiProperty({ enum: ['like', 'notLike', 'in', 'between', '=', '<', '>', '<=', '>=', '<>'] })
-  operator: 'like' | 'notLike' | 'in' | 'between' | '=' | '<' | '>' | '<=' | '>=' | '<>';
+  operator: 'like' | 'notLike' | 'notNull' | 'in' | 'between' | '=' | '<' | '>' | '<=' | '>=' | '<>';
 
   @IsNotEmpty()
   @ApiProperty()
