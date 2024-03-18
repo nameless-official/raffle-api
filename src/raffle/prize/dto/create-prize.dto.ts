@@ -18,8 +18,6 @@ export class CreatePrizeDto {
   description?: string;
 
   @IsOptional()
-  @IsDecimal({}, { message: 'Property value must be a decimal value' })
-  @Min(0, { message: 'Property value must be greater than or equal to 0' })
   value?: number;
 
   @IsOptional()
