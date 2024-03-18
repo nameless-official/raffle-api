@@ -106,11 +106,11 @@ export class ParticipantController extends BaseController<Participant, CreatePar
   @UseGuards(AuthGuard)
   @Put('selectWinners/:raffleId')
   async selectWinners(
-    @Param('raffleId') raffleId: number,
+    @Param('raffleId') raffle_id: number,
     @Body() selectedtWinnersDto: { participant_id: number; prize_id: number }[],
   ) {
     for (const { participant_id, prize_id } of selectedtWinnersDto) {
-      await this.participantService.update(participant_id, { prize_id });
+      await this.participantService.update(participant_id, { prize_id, raffle_id });
     }
     return selectedtWinnersDto.map((w) => {
       return { participantId: w.participant_id, prizeId: w.prize_id };
