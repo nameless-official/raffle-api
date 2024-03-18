@@ -12,10 +12,10 @@ export class Raffle {
   @Column({ length: 255 })
   name: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'timestamp' })
   start_date: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'timestamp' })
   end_date: Date;
 
   @Column({ type: 'text', nullable: true })
