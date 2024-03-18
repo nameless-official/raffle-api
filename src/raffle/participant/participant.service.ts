@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { BaseService } from 'src/common/service';
 import { RaffleService } from '../raffle/raffle.service';
 import { CustomException } from 'src/common/exeptions/custom.exeption';
+import { compareAsc, compareDesc } from 'date-fns';
 
 @Injectable()
 export class ParticipantService extends BaseService<Participant, CreateParticipantDto, UpdateParticipantDto> {
@@ -39,7 +40,13 @@ export class ParticipantService extends BaseService<Participant, CreateParticipa
       const newParticipant = this.participantRepository.create(createParticipantDto);
 
       const raffle = await this.raffleService.findOne(raffleId);
-      if (!raffle) throw new CustomException(`The selected raffle, does not exists`, HttpStatus.NOT_FOUND);
+      if (!raffle) throw new CustomException('The selected raffle, does not exists', HttpStatus.NOT_FOUND);
+
+      if (compareDesc(raffle.start_date, new Date()) === 1 || compareAsc(new Date(), raffle.end_date) === 1)
+        throw new CustomException(
+          'The selected raffle does not accept participants at this time',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
 
       const existingParticipant = await this.participantRepository.findOne({
         where: { discord_user_id: discordUserId.toString(), raffle },
