@@ -218,6 +218,9 @@ export abstract class BaseService<T, GenericCreateDto, GenericUpdateDto> {
         case 'notLike':
           queryBuilder.andWhere(`${this.repository.metadata.tableName}.${field} NOT LIKE '${value}'`);
           break;
+        case 'notNull':
+          queryBuilder.andWhere(`${this.repository.metadata.tableName}.${field} IS NOT NULL`);
+          break;
         case 'in':
           queryBuilder.andWhere(
             `${this.repository.metadata.tableName}.${field} IN (${value.map((str) => `'${str}'`).join(', ')})`,
