@@ -59,18 +59,18 @@ export class PrizeService extends BaseService<Prize, CreatePrizeDto, UpdatePrize
 
     const { prize_level_id: prizeLevelId } = updatePrizeDto;
 
-    const newRaffle = this.prizeRepository.create(updatePrizeDto);
+    const newPrize = this.prizeRepository.create(updatePrizeDto);
 
     if (prizeLevelId) {
       const prizeLevel = await this.prizeLevelService.findOne(prizeLevelId);
       if (!prizeLevel)
         throw new CustomException(`The selected raffle ${prizeLevelId}, does not exists`, HttpStatus.NOT_FOUND);
 
-      newRaffle.prizeLevel = prizeLevel;
+      newPrize.prizeLevel = prizeLevel;
     }
 
     try {
-      await this.prizeRepository.update(prizeId, updatePrizeDto);
+      await this.prizeRepository.update(prizeId, newPrize);
       return this.findOne(prizeId);
     } catch (error) {
       this.serviceErrorHandler(error);
