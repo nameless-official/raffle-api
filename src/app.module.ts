@@ -10,6 +10,7 @@ import { RaffleModule } from './raffle/raffle/raffle.module';
 import { PrizeModule } from './raffle/prize/prize.module';
 import { ParticipantModule } from './raffle/participant/participant.module';
 import { DiscordModule } from './discord/discord.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { DiscordModule } from './discord/discord.module';
     PrizeModule,
     ParticipantModule,
     DiscordModule,
+    ImageModule,
   ],
   controllers: [],
   providers: [],

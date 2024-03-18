@@ -3,6 +3,15 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NotFoundExceptionFilter } from './common/filters/not-found.filter';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { initializeApp, cert } = require('firebase-admin/app');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const serviceAccount = require('../nameless-firebase-adminsdk.json');
+
+initializeApp({
+  credential: cert(serviceAccount),
+  storageBucket: 'nameless-afa75.appspot.com',
+});
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
