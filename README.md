@@ -1,4 +1,4 @@
-<h1 align="center" id="title">RaflleApp</h1>
+<h1 align="center" id="title">Raflle API</h1>
 
 <p id="description">Aplicación para el CodeQuest de DevTalles.</p>
 
