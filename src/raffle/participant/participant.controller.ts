@@ -1,4 +1,4 @@
-import { Body, Controller, Post, BadRequestException, Param, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, BadRequestException, Param, Put, UseGuards, Get, HttpStatus } from '@nestjs/common';
 import { ParticipantService } from './participant.service';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
@@ -12,6 +12,7 @@ import { Roles } from 'src/role/role.decorator';
 import { PrizeService } from '../prize/prize.service';
 import { RaffleService } from '../raffle/raffle.service';
 import { SearchDto } from 'src/common/dto/search.dto';
+import { CustomException } from 'src/common/exeptions/custom.exeption';
 
 @ApiBearerAuth()
 @ApiTags('Participant')
@@ -115,5 +116,33 @@ export class ParticipantController extends BaseController<Participant, CreatePar
     return selectedtWinnersDto.map((w) => {
       return { participantId: w.participant_id, prizeId: w.prize_id };
     });
+  }
+
+  @ApiOperation({ summary: 'Select Winners for a raffle slug' })
+  @ApiParam({ name: 'raffleSlug', type: 'string' })
+  @UseGuards(AuthGuard)
+  @Get('getRaffleWinners/:raffleSlug')
+  async getRaffleWinners(@Param('raffleSlug') raffleSlug: string): Promise<Participant[]> {
+    const [raffle] = await this.raffleService.search(
+      { conditions: [{ field: 'slug', operator: '=', value: raffleSlug }] },
+      {},
+    );
+    if (!raffle) throw new CustomException(`The selected raffle, does not exists`, HttpStatus.NOT_FOUND);
+
+    if (raffle.raffleStatus.code !== 'COUNTING')
+      throw new CustomException(
+        'The selected raffle does not accept participants at this time',
+        HttpStatus.NOT_ACCEPTABLE,
+      );
+
+    const raffleWinnersSearchConditions: SearchDto = {
+      conditions: [
+        { field: 'raffle_id', operator: '=', value: raffle.raffle_id },
+        { field: 'prize_id', operator: 'notNull', value: '' },
+      ],
+    };
+    const { totalRecords } = await this.participantService.searchTotalRecords(raffleWinnersSearchConditions, {});
+
+    return this.participantService.search(raffleWinnersSearchConditions, { limit: totalRecords, offset: 0 });
   }
 }
