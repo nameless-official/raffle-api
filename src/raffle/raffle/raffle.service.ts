@@ -9,6 +9,7 @@ import { RaffleStatusService } from '../raffle_status/raffle_status.service';
 import slugify from 'slugify';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { TotalRecords } from 'src/common/dto/total-records.dto';
+import { SearchDto } from 'src/common/dto/search.dto';
 
 @Injectable()
 export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRaffleDto> {
@@ -120,6 +121,60 @@ export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRa
 
       const totalRecords = await queryBuilder.getCount();
       return { totalRecords };
+    } catch (error) {
+      this.serviceErrorHandler(error);
+    }
+  }
+
+  async finishRaffle(raffleId: number): Promise<Raffle> {
+    try {
+      const raffleStatusSearchConditions: SearchDto = {
+        conditions: [{ field: 'code', operator: '=', value: 'FINISHED' }],
+      };
+
+      const [raffleStatus] = await this.raffleStatusService.search(raffleStatusSearchConditions, {
+        limit: 1,
+        offset: 0,
+      });
+
+      await this.raffleRepository.update(raffleId, { raffleStatus });
+      return this.findOne(raffleId);
+    } catch (error) {
+      this.serviceErrorHandler(error);
+    }
+  }
+
+  async cancelRaffle(raffleId: number): Promise<Raffle> {
+    try {
+      const raffleStatusSearchConditions: SearchDto = {
+        conditions: [{ field: 'code', operator: '=', value: 'CANCELLED' }],
+      };
+
+      const [raffleStatus] = await this.raffleStatusService.search(raffleStatusSearchConditions, {
+        limit: 1,
+        offset: 0,
+      });
+
+      await this.raffleRepository.update(raffleId, { raffleStatus });
+      return this.findOne(raffleId);
+    } catch (error) {
+      this.serviceErrorHandler(error);
+    }
+  }
+
+  async archiveRaffle(raffleId: number): Promise<Raffle> {
+    try {
+      const raffleStatusSearchConditions: SearchDto = {
+        conditions: [{ field: 'code', operator: '=', value: 'ARCHIVED' }],
+      };
+
+      const [raffleStatus] = await this.raffleStatusService.search(raffleStatusSearchConditions, {
+        limit: 1,
+        offset: 0,
+      });
+
+      await this.raffleRepository.update(raffleId, { raffleStatus });
+      return this.findOne(raffleId);
     } catch (error) {
       this.serviceErrorHandler(error);
     }
