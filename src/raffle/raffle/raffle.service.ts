@@ -74,7 +74,7 @@ export class RaffleService extends BaseService<Raffle, CreateRaffleDto, UpdateRa
     }
 
     try {
-      await this.raffleRepository.update(raffleId, updateRaffleDto);
+      await this.raffleRepository.update(raffleId, newRaffle);
       return this.findOne(raffleId);
     } catch (error) {
       this.serviceErrorHandler(error);
