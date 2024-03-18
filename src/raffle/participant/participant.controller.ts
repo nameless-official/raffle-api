@@ -64,7 +64,7 @@ export class ParticipantController extends BaseController<Participant, CreatePar
     for (const { winner, prize } of winners) {
       await this.participantService.update(winner, { prize_id: prize });
     }
-
+    this.raffleService.finishRaffle(+raffleId);
     return winners.map((w) => {
       return { participantId: w.winner, prizeId: w.prize };
     });
@@ -96,6 +96,7 @@ export class ParticipantController extends BaseController<Participant, CreatePar
       await this.participantService.update(winner, { prize_id: prize });
     }
 
+    this.raffleService.finishRaffle(+raffleId);
     return winners.map((w) => {
       return { participantId: w.winner, prizeId: w.prize };
     });
@@ -108,19 +109,19 @@ export class ParticipantController extends BaseController<Participant, CreatePar
   @Put('selectWinners/:raffleId')
   async selectWinners(
     @Param('raffleId') raffle_id: number,
-    @Body() selectedtWinnersDto: { participant_id: number; prize_id: number }[],
+    @Body() selectedtWinnersDto: { selectedWinners: { participant_id: number; prize_id: number }[] },
   ) {
-    for (const { participant_id, prize_id } of selectedtWinnersDto) {
-      await this.participantService.update(participant_id, { prize_id, raffle_id });
+    for (const { participant_id, prize_id } of selectedtWinnersDto.selectedWinners) {
+      await this.participantService.update(participant_id, { prize_id, raffle_id: +raffle_id });
     }
-    return selectedtWinnersDto.map((w) => {
+    this.raffleService.finishRaffle(+raffle_id);
+    return selectedtWinnersDto.selectedWinners.map((w) => {
       return { participantId: w.participant_id, prizeId: w.prize_id };
     });
   }
 
   @ApiOperation({ summary: 'Select Winners for a raffle slug' })
   @ApiParam({ name: 'raffleSlug', type: 'string' })
-  @UseGuards(AuthGuard)
   @Get('getRaffleWinners/:raffleSlug')
   async getRaffleWinners(@Param('raffleSlug') raffleSlug: string): Promise<Participant[]> {
     const [raffle] = await this.raffleService.search(
@@ -129,7 +130,11 @@ export class ParticipantController extends BaseController<Participant, CreatePar
     );
     if (!raffle) throw new CustomException(`The selected raffle, does not exists`, HttpStatus.NOT_FOUND);
 
-    if (raffle.raffleStatus.code !== 'COUNTING')
+    if (
+      raffle.raffleStatus.code === 'PUBLISHED' ||
+      raffle.raffleStatus.code === 'DRAFT' ||
+      raffle.raffleStatus.code === 'CANCELLED'
+    )
       throw new CustomException(
         'The selected raffle does not accept participants at this time',
         HttpStatus.NOT_ACCEPTABLE,
