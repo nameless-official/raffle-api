@@ -32,7 +32,7 @@ async function bootstrap() {
       'http://localhost:4200',
       'http://localhost:3000',
       'https://raffle-api.up.railway.app',
-      'https://raffle-app.up.railway.app',
+      'https://raffle-app.azurewebsites.net',
     ],
   });
 
