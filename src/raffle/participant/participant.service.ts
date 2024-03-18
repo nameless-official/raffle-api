@@ -14,7 +14,7 @@ export class ParticipantService extends BaseService<Participant, CreateParticipa
   public findOneId = 'participant_id';
   public createDTO = CreateParticipantDto;
   public updateDTO = UpdateParticipantDto;
-  public relations: string[] = ['prize'];
+  public relations: string[] = ['prize', 'raffle'];
   constructor(
     @Inject('PARTICIPANT_REPOSITORY')
     private participantRepository: Repository<Participant>,

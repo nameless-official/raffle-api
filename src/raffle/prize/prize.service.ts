@@ -13,7 +13,7 @@ export class PrizeService extends BaseService<Prize, CreatePrizeDto, UpdatePrize
   public findOneId = 'prize_id';
   public createDTO = CreatePrizeDto;
   public updateDTO = UpdatePrizeDto;
-  public relations: string[] = ['prizeLevel'];
+  public relations: string[] = ['prizeLevel', 'raffle'];
   constructor(
     @Inject('PRIZE_REPOSITORY')
     private prizeRepository: Repository<Prize>,
